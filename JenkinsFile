@@ -1,0 +1,52 @@
+pipeline{
+    agent any
+    tools{
+        maven 'Maven-3.9.11'
+    }
+    environment{
+        DOCKER_IMAGE='ci-cd-pipeline'
+        CONTAINER_IMAGE='ci-cd-pipeline-app'
+    }
+    stages{
+        stage('parameters'){
+            steps{
+                sh 'echo env = $ENVIRONMENT , branch = $BRANCH_NAME'
+            }
+        }
+        stage('git clone'){
+            steps{
+                git branch: '$BRANCH_NAME', url: 'https://github.com/vgowrisankar1297/CI-CD.git'
+            }
+        }
+        stage('maven test stage'){
+            when{
+                expression{
+                    ENVIRONMENT == 'testing'
+                }
+            }
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('maven build stage'){
+            steps{
+                sh 'mvn clean install -DskipTests=true'
+            }
+        }
+        stage('docker build image'){
+            steps{
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+        stage('docker remove old-container'){
+            steps{
+                sh 'docker rm -f $CONTAINER_IMAGE || true'
+            }
+        }
+        stage('docker run new-container'){
+            steps{
+                sh 'docker run -d -p 9001:9000 --name $CONTAINER_IMAGE $DOCKER_IMAGE'
+            }
+        }
+    }
+}
