@@ -18,14 +18,14 @@ pipeline{
             }
         }
 
-        stage('Checkout Code')
+        stage('Checkout Code'){
             steps{
                 git branch: "${params.BRANCH_NAME}",
                     url: 'https://github.com/vgowrisankar1297/CI-CD.git'
             }
         }
 
-        stage('Maven Test') {
+        stage('Maven Test'){
             when{
                 expression{
                     params.ENVIRONMENT == 'testing'
