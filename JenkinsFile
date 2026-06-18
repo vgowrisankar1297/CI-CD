@@ -3,22 +3,29 @@ pipeline{
     tools{
         maven 'Maven-3.9.11'
     }
+
     environment{
-        DOCKER_IMAGE='ci-cd-pipeline'
-        CONTAINER_IMAGE='ci-cd-pipeline-app'
+        DOCKER_IMAGE = "ci-cd-pipeline"
+        CONTAINER_NAME = "ci-cd-pipeline-app"
     }
+
     stages{
-        stage('parameters'){
+
+        stage('Show Parameters'){
             steps{
-                sh 'echo env = $params.ENVIRONMENT , branch = $params.BRANCH_NAME'
+                echo "Environment = ${params.ENVIRONMENT}"
+                echo "Branch = ${params.BRANCH_NAME}"
             }
         }
-        stage('git clone'){
+
+        stage('Checkout Code')
             steps{
-                git branch: '$params.BRANCH_NAME', url: 'https://github.com/vgowrisankar1297/CI-CD.git'
+                git branch: "${params.BRANCH_NAME}",
+                    url: 'https://github.com/vgowrisankar1297/CI-CD.git'
             }
         }
-        stage('maven test stage'){
+
+        stage('Maven Test') {
             when{
                 expression{
                     params.ENVIRONMENT == 'testing'
@@ -28,25 +35,39 @@ pipeline{
                 sh 'mvn test'
             }
         }
-        stage('maven build stage'){
+
+        stage('Maven Build'){
             steps{
                 sh 'mvn clean install -DskipTests=true'
             }
         }
-        stage('docker build image'){
+
+        stage('Docker Build Image'){
             steps{
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
-        stage('docker remove old-container'){
+
+        stage('Remove Old Container'){
             steps{
-                sh 'docker rm -f $CONTAINER_IMAGE || true'
+                sh "docker rm -f ${CONTAINER_NAME} || true"
             }
         }
-        stage('docker run new-container'){
+
+        stage('Run Container'){
             steps{
-                sh 'docker run -d -p 9001:9000 --name $CONTAINER_IMAGE $DOCKER_IMAGE'
+                sh "docker run -d -p 9001:9000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}"
             }
+        }
+    }
+
+    post{
+        success{
+            echo "Pipeline executed successfully!"
+        }
+
+        failure{
+            echo "Pipeline failed. Check logs."
         }
     }
 }
