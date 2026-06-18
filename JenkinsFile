@@ -10,18 +10,18 @@ pipeline{
     stages{
         stage('parameters'){
             steps{
-                sh 'echo env = $ENVIRONMENT , branch = $BRANCH_NAME'
+                sh 'echo env = $params.ENVIRONMENT , branch = $params.BRANCH_NAME'
             }
         }
         stage('git clone'){
             steps{
-                git branch: '$BRANCH_NAME', url: 'https://github.com/vgowrisankar1297/CI-CD.git'
+                git branch: '$params.BRANCH_NAME', url: 'https://github.com/vgowrisankar1297/CI-CD.git'
             }
         }
         stage('maven test stage'){
             when{
                 expression{
-                    ENVIRONMENT == 'testing'
+                    params.ENVIRONMENT == 'testing'
                 }
             }
             steps{
