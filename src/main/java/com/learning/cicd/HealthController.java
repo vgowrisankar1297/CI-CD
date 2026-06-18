@@ -1,5 +1,6 @@
 package com.learning.cicd;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     @GetMapping("/check")
-    public String checkHealth() {
-        return "Application is running and Health check is ok";
+    public ResponseEntity<String> checkHealth() {
+        return ResponseEntity.ok().body("Healthy and Running");
     }
 }
