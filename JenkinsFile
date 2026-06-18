@@ -11,6 +11,17 @@ pipeline{
 
     stages{
 
+        stage('Debug Environment') {
+            steps {
+                sh 'which java'
+                sh 'java -version'
+                sh 'which javac'
+                sh 'javac -version'
+                sh 'echo JAVA_HOME=$JAVA_HOME'
+                sh 'mvn -version'
+            }
+        }
+
         stage('Show Parameters'){
             steps{
                 echo "Environment = ${params.ENVIRONMENT}"
